@@ -3,11 +3,11 @@ import axios from 'axios';
 
 // Configure axios baseURL only if not in development with proxy
 // In development, the proxy in package.json handles routing
-// In production, use REACT_APP_API_URL or default to localhost:5000
+// In production, use REACT_APP_API_URL or default to production server URL
 if (process.env.REACT_APP_API_URL) {
   axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 } else if (process.env.NODE_ENV === 'production') {
-  axios.defaults.baseURL = 'http://localhost:5000';
+  axios.defaults.baseURL = 'https://marketsync01.onrender.com';
 }
 
 // Configure axios to send cookies with requests

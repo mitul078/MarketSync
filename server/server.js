@@ -8,8 +8,13 @@ const app = express();
 
 // CORS configuration to allow credentials (cookies)
 const allowedOrigins = process.env.CLIENT_URL 
-  ? process.env.CLIENT_URL.split(',')
-  : ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000'];
+  ? process.env.CLIENT_URL.split(',').map(url => url.trim())
+  : [
+      'https://market-sync-3o9w.vercel.app',  // Production client URL
+      'http://localhost:3000', 
+      'http://localhost:3001', 
+      'http://127.0.0.1:3000'
+    ];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -17,8 +22,14 @@ const corsOptions = {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      console.warn('CORS blocked origin:', origin);
-      callback(null, true); // Allow all origins in development - tighten for production
+      // In production, block unknown origins; in development, allow all for testing
+      if (process.env.NODE_ENV === 'production') {
+        console.warn('CORS blocked origin:', origin);
+        callback(new Error('Not allowed by CORS'));
+      } else {
+        console.warn('CORS: Allowing origin in development:', origin);
+        callback(null, true);
+      }
     }
   },
   credentials: true, // Allow cookies to be sent - MUST be true for cookies to work
