@@ -17,3 +17,4 @@ console.log('📝 Example .env entry:');
 console.log(`JWT_SECRET=${jwtSecret}\n`);
 
 
+

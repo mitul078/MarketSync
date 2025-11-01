@@ -200,3 +200,4 @@ REACT_APP_API_URL=https://your-backend-url.railway.app
 Share your deployed URL with others or use it for your personal trading journal.
 
 
+

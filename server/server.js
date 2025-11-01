@@ -49,6 +49,10 @@ app.use(express.urlencoded({ extended: true }));
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/marketsync';
 
+if (!MONGODB_URI || MONGODB_URI === 'mongodb://localhost:27017/marketsync') {
+  console.warn('⚠️  Warning: Using default MongoDB URI. Set MONGODB_URI environment variable for production.');
+}
+
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -58,6 +62,10 @@ mongoose.connect(MONGODB_URI, {
 })
 .catch((err) => {
   console.error('❌ MongoDB connection error:', err);
+  // Don't exit in production, let the server start and retry
+  if (process.env.NODE_ENV === 'production') {
+    console.error('⚠️  Server will continue to run, but database operations will fail until connection is restored.');
+  }
 });
 
 // Routes
@@ -90,8 +98,16 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+// Listen on all interfaces (0.0.0.0) for production deployments
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use`);
+  } else {
+    console.error('❌ Server startup error:', err);
+  }
+  process.exit(1);
 });
 
