@@ -13,6 +13,34 @@ if (process.env.REACT_APP_API_URL) {
 // Configure axios to send cookies with requests
 axios.defaults.withCredentials = true;
 
+// Add axios interceptor to attach token to requests
+axios.interceptors.request.use(
+  (config) => {
+    // Get token from localStorage if available
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to handle 401 errors globally
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear token and user data on 401
+      localStorage.removeItem('token');
+      // Note: User state will be cleared by the AuthContext
+    }
+    return Promise.reject(error);
+  }
+);
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -31,11 +59,20 @@ export const AuthProvider = ({ children }) => {
     // Check if user is authenticated by calling /me endpoint
     const checkAuth = async () => {
       try {
+        // Check if token exists in localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+        
         const response = await axios.get('/api/auth/me');
         setUser(response.data.user);
       } catch (error) {
         // Not authenticated or token expired
         setUser(null);
+        localStorage.removeItem('token');
       } finally {
         setLoading(false);
       }
@@ -47,9 +84,14 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await axios.post('/api/auth/login', credentials);
-      const { user } = response.data;
+      const { user, token } = response.data;
       
-      // Set state (token is stored in httpOnly cookie)
+      // Store token in localStorage for Authorization header fallback
+      if (token) {
+        localStorage.setItem('token', token);
+      }
+      
+      // Set state (token is stored in httpOnly cookie AND localStorage)
       setUser(user);
       
       return { user };
@@ -63,9 +105,14 @@ export const AuthProvider = ({ children }) => {
   const signup = async (userData) => {
     try {
       const response = await axios.post('/api/auth/signup', userData);
-      const { user } = response.data;
+      const { user, token } = response.data;
       
-      // Set state (token is stored in httpOnly cookie)
+      // Store token in localStorage for Authorization header fallback
+      if (token) {
+        localStorage.setItem('token', token);
+      }
+      
+      // Set state (token is stored in httpOnly cookie AND localStorage)
       setUser(user);
       
       return { user };
@@ -83,8 +130,9 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      // Clear state regardless of API call result
+      // Clear state and token regardless of API call result
       setUser(null);
+      localStorage.removeItem('token');
     }
   };
 

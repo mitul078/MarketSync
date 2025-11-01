@@ -58,13 +58,14 @@ exports.signup = async (req, res) => {
       path: '/' // Available on all paths
     });
 
-    // Return user data without password (no token in response)
+    // Return user data without password
     const userObj = user.toObject();
     delete userObj.password;
 
     res.status(201).json({
       message: 'User registered successfully',
-      user: userObj
+      user: userObj,
+      token // Also return token for Authorization header fallback
     });
   } catch (error) {
     console.error('Signup error:', error);
@@ -116,13 +117,14 @@ exports.login = async (req, res) => {
       path: '/' // Available on all paths
     });
 
-    // Return user data without password (no token in response)
+    // Return user data without password
     const userObj = user.toObject();
     delete userObj.password;
 
     res.json({
       message: 'Login successful',
-      user: userObj
+      user: userObj,
+      token // Also return token for Authorization header fallback
     });
   } catch (error) {
     console.error('Login error:', error);
