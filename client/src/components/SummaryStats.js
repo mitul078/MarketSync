@@ -97,21 +97,21 @@ const SummaryStats = ({ trades }) => {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {statCards.map((stat, index) => (
           <div key={index} className="card">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{stat.title}</p>
-                <p className={`text-2xl font-bold ${stat.valueColor || 'text-gray-900 dark:text-white'}`}>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">{stat.title}</p>
+                <p className={`text-xl sm:text-2xl font-bold truncate ${stat.valueColor || 'text-gray-900 dark:text-white'}`}>
                   {stat.value}
                 </p>
                 {stat.subtitle && (
                   <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">{stat.subtitle}</p>
                 )}
               </div>
-              <div className={`${stat.bgColor} p-3 rounded-lg`}>
-                <stat.icon className="w-6 h-6 text-white" />
+              <div className={`${stat.bgColor} p-2 sm:p-3 rounded-lg flex-shrink-0 ml-2`}>
+                <stat.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
             </div>
           </div>
@@ -120,10 +120,10 @@ const SummaryStats = ({ trades }) => {
 
       {/* Additional Metrics */}
       {trades.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="card">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Average P/L per Trade</p>
-            <p className={`text-xl font-bold ${
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Average P/L per Trade</p>
+            <p className={`text-lg sm:text-xl font-bold ${
               stats.avgProfitLoss >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
             }`}>
               {formatCurrency(stats.avgProfitLoss)}
@@ -132,20 +132,20 @@ const SummaryStats = ({ trades }) => {
           
           <div className="card">
             <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="w-4 h-4 text-green-500" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">Best Trade</p>
+              <TrendingUp className="w-4 h-4 text-green-500 flex-shrink-0" />
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Best Trade</p>
             </div>
-            <p className="text-xl font-bold text-green-600 dark:text-green-400">
+            <p className="text-lg sm:text-xl font-bold text-green-600 dark:text-green-400">
               {formatCurrency(stats.bestTrade)}
             </p>
           </div>
           
           <div className="card">
             <div className="flex items-center gap-2 mb-1">
-              <TrendingDown className="w-4 h-4 text-red-500" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">Worst Trade</p>
+              <TrendingDown className="w-4 h-4 text-red-500 flex-shrink-0" />
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Worst Trade</p>
             </div>
-            <p className="text-xl font-bold text-red-600 dark:text-red-400">
+            <p className="text-lg sm:text-xl font-bold text-red-600 dark:text-red-400">
               {formatCurrency(stats.worstTrade)}
             </p>
           </div>
@@ -154,9 +154,10 @@ const SummaryStats = ({ trades }) => {
 
       {/* Performance Chart */}
       {trades.length > 0 && (
-        <div className="card">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Performance Over Time</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="card overflow-x-auto">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Performance Over Time</h3>
+          <div className="w-full" style={{ minWidth: '300px' }}>
+            <ResponsiveContainer width="100%" height={250}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-gray-300 dark:stroke-gray-600" />
               <XAxis 
@@ -198,17 +199,18 @@ const SummaryStats = ({ trades }) => {
               />
             </LineChart>
           </ResponsiveContainer>
+          </div>
         </div>
       )}
 
       {/* Empty State */}
       {trades.length === 0 && (
-        <div className="card text-center py-12">
-          <Target className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <p className="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
+        <div className="card text-center py-8 sm:py-12 px-4">
+          <Target className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-lg sm:text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
             No trades recorded yet
           </p>
-          <p className="text-gray-500 dark:text-gray-500">
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-500">
             Start tracking your trading journey by logging your first trade!
           </p>
         </div>

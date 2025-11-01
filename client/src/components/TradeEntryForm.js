@@ -301,15 +301,15 @@ const TradeEntryForm = ({ onSubmit, balance }) => {
 
   return (
     <div className="card max-w-2xl mx-auto">
-      <div className="flex items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <TrendingUp className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+      <div className="flex items-center mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600 dark:text-primary-400" />
           Log New Trade
         </h2>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div className="md:col-span-2">
             <label htmlFor="tradeDateTime" className="label">
               Trade Date

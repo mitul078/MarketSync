@@ -157,41 +157,42 @@ function App() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-primary-600 dark:text-primary-400">MarketSync</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Your Personal Trading Journal</p>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-primary-600 dark:text-primary-400">MarketSync</h1>
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:block">Your Personal Trading Journal</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 bg-primary-50 dark:bg-primary-900/20 px-4 py-2 rounded-lg">
-                <Wallet className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
+              <div className="flex items-center gap-2 sm:gap-3 bg-primary-50 dark:bg-primary-900/20 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg">
+                <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 dark:text-primary-400 flex-shrink-0" />
                 <div className="text-right">
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Balance</p>
-                  <p className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 hidden sm:block">Balance</p>
+                  <p className="text-sm sm:text-lg font-bold text-primary-600 dark:text-primary-400">
                     ₹{(balance || 0).toLocaleString()}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                <User className="w-5 h-5" />
-                <span className="text-sm font-medium">{user?.name || user?.username}</span>
+              <div className="flex items-center gap-1 sm:gap-2 text-gray-600 dark:text-gray-400">
+                <User className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="text-xs sm:text-sm font-medium hidden sm:inline">{user?.name || user?.username}</span>
+                <span className="text-xs sm:hidden font-medium truncate max-w-[80px]">{user?.name || user?.username}</span>
               </div>
               <button
                 onClick={toggleDarkMode}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                className="p-1.5 sm:p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
                 aria-label="Toggle dark mode"
               >
-                {darkMode ? <Sun className="w-6 h-6 text-yellow-500" /> : <Moon className="w-6 h-6 text-gray-700" />}
+                {darkMode ? <Sun className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" /> : <Moon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />}
               </button>
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 text-red-600 dark:text-red-400"
+                className="p-1.5 sm:p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 text-red-600 dark:text-red-400"
                 aria-label="Logout"
               >
-                <LogOut className="w-6 h-6" />
+                <LogOut className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
           </div>
@@ -199,11 +200,11 @@ function App() {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg w-fit">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pt-4 sm:pt-6">
+        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg w-full sm:w-fit overflow-x-auto sm:overflow-visible">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`px-6 py-2 rounded-md font-medium transition-colors duration-200 ${
+            className={`px-3 sm:px-6 py-2 rounded-md font-medium text-sm sm:text-base transition-colors duration-200 whitespace-nowrap flex-shrink-0 ${
               activeTab === 'dashboard'
                 ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
@@ -213,7 +214,7 @@ function App() {
           </button>
           <button
             onClick={() => setActiveTab('new-trade')}
-            className={`px-6 py-2 rounded-md font-medium transition-colors duration-200 ${
+            className={`px-3 sm:px-6 py-2 rounded-md font-medium text-sm sm:text-base transition-colors duration-200 whitespace-nowrap flex-shrink-0 ${
               activeTab === 'new-trade'
                 ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
@@ -223,26 +224,26 @@ function App() {
           </button>
           <button
             onClick={() => setActiveTab('add-funds')}
-            className={`px-6 py-2 rounded-md font-medium transition-colors duration-200 ${
+            className={`px-3 sm:px-6 py-2 rounded-md font-medium text-sm sm:text-base transition-colors duration-200 whitespace-nowrap flex-shrink-0 ${
               activeTab === 'add-funds'
                 ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             }`}
           >
-            <Wallet className="w-4 h-4 inline mr-2" />
+            <Wallet className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
             Wallet
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6">
         {tradesLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-xl font-semibold text-gray-600 dark:text-gray-400">Loading trades...</div>
+          <div className="flex items-center justify-center py-8 sm:py-12">
+            <div className="text-lg sm:text-xl font-semibold text-gray-600 dark:text-gray-400">Loading trades...</div>
           </div>
         ) : activeTab === 'dashboard' ? (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <SummaryStats trades={trades} />
             <TradeList trades={trades} onDelete={handleTradeDelete} />
           </div>
@@ -254,8 +255,8 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-12 py-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-600 dark:text-gray-400">
+      <footer className="mt-8 sm:mt-12 py-4 sm:py-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 text-center text-xs sm:text-sm text-gray-600 dark:text-gray-400">
           © 2025 MarketSync. Build your trading discipline, one trade at a time.
         </div>
       </footer>

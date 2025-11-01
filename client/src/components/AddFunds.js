@@ -31,25 +31,25 @@ const AddFunds = ({ onAdd, balance }) => {
 
   return (
     <div className="card max-w-md mx-auto">
-      <div className="flex items-center justify-center mb-6">
-        <div className="p-3 bg-primary-100 dark:bg-primary-900 rounded-full">
-          <Wallet className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+      <div className="flex items-center justify-center mb-4 sm:mb-6">
+        <div className="p-2 sm:p-3 bg-primary-100 dark:bg-primary-900 rounded-full">
+          <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600 dark:text-primary-400" />
         </div>
       </div>
 
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
         Add Funds to Wallet
       </h2>
       
-      <div className="text-center mb-6">
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Current Balance</p>
-        <p className="text-3xl font-bold text-primary-600 dark:text-primary-400 flex items-center justify-center gap-2">
-          <DollarSign className="w-8 h-8" />
-          {(balance || 0).toFixed(2)}
+      <div className="text-center mb-4 sm:mb-6">
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2">Current Balance</p>
+        <p className="text-2xl sm:text-3xl font-bold text-primary-600 dark:text-primary-400 flex items-center justify-center gap-2">
+          <DollarSign className="w-6 h-6 sm:w-8 sm:h-8" />
+          ₹{(balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         <div>
           <label htmlFor="amount" className="label">
             Amount (₹)
@@ -75,7 +75,7 @@ const AddFunds = ({ onAdd, balance }) => {
                 key={amt}
                 type="button"
                 onClick={() => setAmount(amt.toString())}
-                className="px-4 py-2 text-sm font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                className="px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
               >
                 ₹{amt.toLocaleString()}
               </button>
