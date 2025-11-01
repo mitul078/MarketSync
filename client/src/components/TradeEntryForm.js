@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, TrendingUp, TrendingDown, Wallet, DollarSign } from 'lucide-react';
+import { Save, TrendingUp, Wallet } from 'lucide-react';
 
 const TradeEntryForm = ({ onSubmit, balance }) => {
   const [formData, setFormData] = useState({

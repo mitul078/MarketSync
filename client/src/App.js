@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Moon, Sun, LogOut, User, Wallet } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import TradeEntryForm from './components/TradeEntryForm';
@@ -32,14 +32,7 @@ function App() {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchTrades();
-      fetchBalance();
-    }
-  }, [isAuthenticated]);
-
-  const fetchTrades = async () => {
+  const fetchTrades = useCallback(async () => {
     setTradesLoading(true);
     try {
       const response = await axios.get('/api/trades');
@@ -53,16 +46,23 @@ function App() {
     } finally {
       setTradesLoading(false);
     }
-  };
+  }, [logout]);
 
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     try {
       const response = await axios.get('/api/wallet/balance');
       setBalance(response.data.balance);
     } catch (error) {
       console.error('Error fetching balance:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchTrades();
+      fetchBalance();
+    }
+  }, [isAuthenticated, fetchTrades, fetchBalance]);
 
   const handleTradeSubmit = async (tradeData) => {
     try {

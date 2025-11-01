@@ -16,3 +16,4 @@ console.log('\n✅ Copy this to your .env file as JWT_SECRET\n');
 console.log('📝 Example .env entry:');
 console.log(`JWT_SECRET=${jwtSecret}\n`);
 
+
