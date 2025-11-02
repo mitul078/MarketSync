@@ -23,17 +23,17 @@ exports.createWallet = async (userId) => {
 exports.getBalance = async (req, res) => {
   try {
     let wallet = await Wallet.findOne({ user: req.user._id });
-    
+
     if (!wallet) {
       // Create wallet if it doesn't exist
       wallet = await exports.createWallet(req.user._id);
     }
-    
+
     res.json({ balance: wallet.balance });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch balance',
-      message: error.message 
+      message: error.message
     });
   }
 };
@@ -48,7 +48,7 @@ exports.addFunds = async (req, res) => {
     }
 
     let wallet = await Wallet.findOne({ user: req.user._id });
-    
+
     if (!wallet) {
       wallet = await exports.createWallet(req.user._id);
     }
@@ -72,9 +72,9 @@ exports.addFunds = async (req, res) => {
       balance: wallet.balance
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to add funds',
-      message: error.message 
+      message: error.message
     });
   }
 };
@@ -89,7 +89,7 @@ exports.withdrawFunds = async (req, res) => {
     }
 
     let wallet = await Wallet.findOne({ user: req.user._id });
-    
+
     if (!wallet) {
       return res.status(404).json({ error: 'Wallet not found' });
     }
@@ -116,9 +116,9 @@ exports.withdrawFunds = async (req, res) => {
       balance: wallet.balance
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to withdraw funds',
-      message: error.message 
+      message: error.message
     });
   }
 };
@@ -129,23 +129,20 @@ exports.getTransactions = async (req, res) => {
     const transactions = await Transaction.find({ user: req.user._id })
       .sort({ createdAt: -1 })
       .limit(50);
-    
+
     res.json(transactions);
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch transactions',
-      message: error.message 
+      message: error.message
     });
   }
 };
 
-// Update balance when trade is created
-// Logic: When trade completes, capital is returned + profit/loss is added
-// Net effect: balance = balance + profitLoss (capital goes out and comes back, only profit/loss affects balance)
 exports.updateBalanceOnTrade = async (userId, capitalUsed, profitLoss, type, tradeId = null) => {
   try {
     let wallet = await Wallet.findOne({ user: userId });
-    
+
     if (!wallet) {
       wallet = await exports.createWallet(userId);
     }
@@ -161,8 +158,8 @@ exports.updateBalanceOnTrade = async (userId, capitalUsed, profitLoss, type, tra
       user: userId,
       type: profitLossAmount >= 0 ? 'deposit' : 'withdrawal',
       amount: Math.abs(profitLossAmount),
-      description: profitLossAmount >= 0 
-        ? `Trade profit: ₹${profitLossAmount.toFixed(2)} (Capital used: ₹${parseFloat(capitalUsed).toFixed(2)})` 
+      description: profitLossAmount >= 0
+        ? `Trade profit: ₹${profitLossAmount.toFixed(2)} (Capital used: ₹${parseFloat(capitalUsed).toFixed(2)})`
         : `Trade loss: ₹${Math.abs(profitLossAmount).toFixed(2)} (Capital used: ₹${parseFloat(capitalUsed).toFixed(2)})`,
       trade: tradeId
     });
@@ -175,25 +172,17 @@ exports.updateBalanceOnTrade = async (userId, capitalUsed, profitLoss, type, tra
   }
 };
 
-// Refund or reverse trade impact (e.g., on trade deletion)
-// This reverses the trade: balance = balance - profitLoss + capitalUsed
+
 exports.refundTrade = async (userId, capitalUsed, profitLoss, tradeId = null) => {
   try {
     const wallet = await Wallet.findOne({ user: userId });
-    
+
     if (!wallet) {
       throw new Error('Wallet not found');
     }
 
-    // Reverse the trade's impact:
-    // Original: balance += profitLoss (net effect)
-    // Reversal: balance -= profitLoss (remove the profit/loss that was added)
-    // Then add back capital: balance += capitalUsed
-    // Net: balance -= profitLoss + capitalUsed = balance - profitLoss + capitalUsed
-    const profitLossAmount = parseFloat(profitLoss) || 0;
-    wallet.balance -= profitLossAmount; // Reverse the profit/loss
-    wallet.balance += parseFloat(capitalUsed) || 0; // Add back capital
-    
+    wallet.balance -= profitLoss;
+
     await wallet.save();
 
     // Create transaction record

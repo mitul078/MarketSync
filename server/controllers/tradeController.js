@@ -8,9 +8,9 @@ exports.getAllTrades = async (req, res) => {
     const trades = await Trade.find({ user: req.user._id }).sort({ tradeDateTime: -1 });
     res.json(trades);
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch trades',
-      message: error.message 
+      message: error.message
     });
   }
 };
@@ -19,16 +19,16 @@ exports.getAllTrades = async (req, res) => {
 exports.getTradeById = async (req, res) => {
   try {
     const trade = await Trade.findOne({ _id: req.params.id, user: req.user._id });
-    
+
     if (!trade) {
       return res.status(404).json({ error: 'Trade not found' });
     }
-    
+
     res.json(trade);
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch trade',
-      message: error.message 
+      message: error.message
     });
   }
 };
@@ -40,14 +40,14 @@ exports.createTrade = async (req, res) => {
 
     // Check wallet balance
     let wallet = await Wallet.findOne({ user: req.user._id });
-    
+
     if (!wallet) {
       wallet = await createWallet(req.user._id);
     }
 
     // Validate sufficient balance (user needs enough capital to make the trade)
     if (wallet.balance < capitalUsed) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Insufficient balance',
         message: `Your wallet balance is ₹${wallet.balance.toFixed(2)}, but you need ₹${capitalUsed.toFixed(2)}. Please add funds first.`
       });
@@ -68,9 +68,9 @@ exports.createTrade = async (req, res) => {
 
     res.status(201).json(savedTrade);
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       error: 'Failed to create trade',
-      message: error.message 
+      message: error.message
     });
   }
 };
@@ -83,16 +83,16 @@ exports.updateTrade = async (req, res) => {
       req.body,
       { new: true, runValidators: true }
     );
-    
+
     if (!trade) {
       return res.status(404).json({ error: 'Trade not found' });
     }
-    
+
     res.json(trade);
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       error: 'Failed to update trade',
-      message: error.message 
+      message: error.message
     });
   }
 };
@@ -101,25 +101,26 @@ exports.updateTrade = async (req, res) => {
 exports.deleteTrade = async (req, res) => {
   try {
     const trade = await Trade.findOne({ _id: req.params.id, user: req.user._id });
-    
+
     if (!trade) {
       return res.status(404).json({ error: 'Trade not found' });
     }
-    
-    // Reverse the trade's impact on wallet:
-    // 1. Remove the profit/loss that was added
-    // 2. Add back the capital that was deducted
-    // Final: balance = balance - profitLoss + capitalUsed
-    await refundTrade(req.user._id, trade.capitalUsed, trade.profitLoss, trade._id);
-    
+
+    const newBalance = await refundTrade(
+      req.user._id,
+      trade.capitalUsed,
+      trade.profitLoss,
+      trade._id
+    );
+
     // Delete the trade
     await Trade.findByIdAndDelete(req.params.id);
-    
-    res.json({ message: 'Trade deleted successfully' });
+
+    res.json({ message: 'Trade deleted successfully' , balance:newBalance });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to delete trade',
-      message: error.message 
+      message: error.message
     });
   }
 };
@@ -128,7 +129,7 @@ exports.deleteTrade = async (req, res) => {
 exports.getStatistics = async (req, res) => {
   try {
     const totalTrades = await Trade.countDocuments({ user: req.user._id });
-    
+
     const aggregation = await Trade.aggregate([
       { $match: { user: req.user._id } },
       {
@@ -160,9 +161,9 @@ exports.getStatistics = async (req, res) => {
 
     res.json(stats);
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch statistics',
-      message: error.message 
+      message: error.message
     });
   }
 };

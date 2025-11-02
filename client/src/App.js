@@ -86,6 +86,7 @@ function App() {
       await axios.delete(`/api/trades/${id}`);
       setTrades(trades.filter(trade => trade._id !== id));
       fetchBalance(); // Refresh balance after deletion (refund)
+      
     } catch (error) {
       console.error('Error deleting trade:', error);
       if (error.response?.status === 401) {
