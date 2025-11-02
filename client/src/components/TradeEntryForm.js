@@ -59,16 +59,15 @@ const TradeEntryForm = ({ onSubmit, balance }) => {
     let brokerage, stt, exchangeTxn, sebiCharges, stampDuty, gst;
 
     if (instrumentType === 'Option') {
-      // OPTION TRADING CHARGES
-      // Brokerage: (0.03% of Turnover × 2 sides) but capped at ₹40
-      const brokeragePercent = (capitalUsed * 0.0003) * 2; // 0.03% of capital × 2 sides
-      brokerage = Math.min(brokeragePercent, 40.00); // Capped at ₹40
+      // OPTION TRADING CHARGES (Zerodha)
+      // Brokerage: ₹0 (buy) + ₹20 (sell) = ₹20 per trade
+      brokerage = 20.00;
 
-      // STT: ExitPrice × Qty × 0.00025
-      stt = exit * qty * 0.00025;
+      // STT: ExitPrice × Qty × 0.000625
+      stt = exit * qty * 0.000625;
 
-      // Exchange Transaction Charges: Turnover × 0.0000345
-      exchangeTxn = turnover * 0.0000345;
+      // Exchange Transaction Charges: Turnover × 0.0005
+      exchangeTxn = turnover * 0.0005;
 
       // SEBI Charges: Turnover × 0.000001
       sebiCharges = turnover * 0.000001;
@@ -79,15 +78,16 @@ const TradeEntryForm = ({ onSubmit, balance }) => {
       // GST: 18% of (Brokerage + Exchange Txn)
       gst = (brokerage + exchangeTxn) * 0.18;
     } else {
-      // STOCK TRADING CHARGES
-      // Brokerage: ₹0 (buy) + ₹20 (sell) = ₹20 per trade
-      brokerage = 20.00;
+      // STOCK TRADING CHARGES (Zerodha)
+      // Brokerage: 0.03% of Turnover × 2 sides, capped at ₹40
+      const brokeragePercent = (turnover * 0.0003) * 2; // 0.03% of turnover × 2 sides
+      brokerage = Math.min(brokeragePercent, 40.00); // Capped at ₹40
 
-      // STT: ExitPrice × Qty × 0.000625
-      stt = exit * qty * 0.000625;
+      // STT: ExitPrice × Qty × 0.00025
+      stt = exit * qty * 0.00025;
 
-      // Exchange Transaction Charges: Turnover × 0.0005
-      exchangeTxn = turnover * 0.0005;
+      // Exchange Transaction Charges: Turnover × 0.0000345
+      exchangeTxn = turnover * 0.0000345;
 
       // SEBI Charges: Turnover × 0.000001
       sebiCharges = turnover * 0.000001;

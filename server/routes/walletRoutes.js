@@ -3,7 +3,7 @@ const router = express.Router();
 const {
   getBalance,
   addFunds,
-  withdrawFunds,
+  resetWallet,
   getTransactions
 } = require('../controllers/walletController');
 const auth = require('../middleware/auth');
@@ -11,12 +11,14 @@ const auth = require('../middleware/auth');
 // All wallet routes require authentication
 router.use(auth);
 
+// Wallet routes
 router.get('/balance', getBalance);
-router.post('/add', addFunds);
-router.post('/withdraw', withdrawFunds);
 router.get('/transactions', getTransactions);
+router.post('/add', addFunds);
+router.post('/reset', resetWallet);
 
 module.exports = router;
+
 
 
 

@@ -110,13 +110,17 @@ exports.deleteTrade = async (req, res) => {
       req.user._id,
       trade.capitalUsed,
       trade.profitLoss,
+      trade.totalCharges || 0,
       trade._id
     );
 
     // Delete the trade
     await Trade.findByIdAndDelete(req.params.id);
 
-    res.json({ message: 'Trade deleted successfully' , balance:newBalance });
+    res.json({ 
+      message: 'Trade deleted successfully',
+      balance: newBalance.balance 
+    });
   } catch (error) {
     res.status(500).json({
       error: 'Failed to delete trade',

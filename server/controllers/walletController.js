@@ -79,66 +79,6 @@ exports.addFunds = async (req, res) => {
   }
 };
 
-// Withdraw funds from wallet
-exports.withdrawFunds = async (req, res) => {
-  try {
-    const { amount } = req.body;
-
-    if (!amount || amount <= 0) {
-      return res.status(400).json({ error: 'Invalid amount. Must be greater than 0.' });
-    }
-
-    let wallet = await Wallet.findOne({ user: req.user._id });
-
-    if (!wallet) {
-      return res.status(404).json({ error: 'Wallet not found' });
-    }
-
-    if (wallet.balance < amount) {
-      return res.status(400).json({ error: 'Insufficient balance' });
-    }
-
-    // Update balance
-    wallet.balance -= amount;
-    await wallet.save();
-
-    // Create transaction record
-    const transaction = new Transaction({
-      user: req.user._id,
-      type: 'withdrawal',
-      amount: amount,
-      description: `Withdrew funds from wallet`
-    });
-    await transaction.save();
-
-    res.json({
-      message: 'Funds withdrawn successfully',
-      balance: wallet.balance
-    });
-  } catch (error) {
-    res.status(500).json({
-      error: 'Failed to withdraw funds',
-      message: error.message
-    });
-  }
-};
-
-// Get transaction history
-exports.getTransactions = async (req, res) => {
-  try {
-    const transactions = await Transaction.find({ user: req.user._id })
-      .sort({ createdAt: -1 })
-      .limit(50);
-
-    res.json(transactions);
-  } catch (error) {
-    res.status(500).json({
-      error: 'Failed to fetch transactions',
-      message: error.message
-    });
-  }
-};
-
 exports.updateBalanceOnTrade = async (userId, capitalUsed, profitLoss, type, tradeId = null) => {
   try {
     let wallet = await Wallet.findOne({ user: userId });
@@ -173,7 +113,7 @@ exports.updateBalanceOnTrade = async (userId, capitalUsed, profitLoss, type, tra
 };
 
 
-exports.refundTrade = async (userId, capitalUsed, profitLoss, tradeId = null) => {
+exports.refundTrade = async (userId, capitalUsed, profitLoss, totalCharges = 0, tradeId = null) => {
   try {
     const wallet = await Wallet.findOne({ user: userId });
 
@@ -181,27 +121,23 @@ exports.refundTrade = async (userId, capitalUsed, profitLoss, tradeId = null) =>
       throw new Error('Wallet not found');
     }
 
-    wallet.balance -= profitLoss;
+    // Convert profitLoss to number for calculations
+    const profitLossAmount = parseFloat(profitLoss) || 0;
 
+    // Simply reverse the profit/loss that was added when trade was created
+    // When trade was created: balance += profitLoss (net profit after charges)
+    // When trade is deleted: balance -= profitLoss (reverse it)
+    // Note: Charges are already included in profitLoss (netProfit = grossProfit - charges)
+    wallet.balance -= profitLossAmount;
     await wallet.save();
 
-    // Create transaction record
-    const transaction = new Transaction({
-      user: userId,
-      type: 'deposit',
-      amount: parseFloat(capitalUsed) || 0,
-      description: `Refund for deleted trade (Capital: ₹${capitalUsed.toFixed(2)}, P/L: ₹${profitLossAmount.toFixed(2)})`,
-      trade: tradeId
-    });
-    await transaction.save();
-
-    // Create separate transaction for reversing profit/loss if it was non-zero
+    // Create transaction record for reversing the profit/loss
     if (profitLossAmount !== 0) {
       const reverseTransaction = new Transaction({
         user: userId,
         type: profitLossAmount > 0 ? 'withdrawal' : 'deposit',
         amount: Math.abs(profitLossAmount),
-        description: `Reversed trade P/L: ₹${profitLossAmount.toFixed(2)}`,
+        description: `Reversed trade P/L: ₹${profitLossAmount.toFixed(2)} (Trade deleted)`,
         trade: tradeId
       });
       await reverseTransaction.save();
@@ -211,6 +147,62 @@ exports.refundTrade = async (userId, capitalUsed, profitLoss, tradeId = null) =>
   } catch (error) {
     console.error('Error refunding trade:', error);
     throw error;
+  }
+};
+
+// Get transaction history
+exports.getTransactions = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({ user: req.user._id })
+      .sort({ createdAt: -1 })
+      .limit(100);
+
+    res.json(transactions);
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to fetch transactions',
+      message: error.message
+    });
+  }
+};
+
+// Reset wallet balance to zero
+exports.resetWallet = async (req, res) => {
+  try {
+    let wallet = await Wallet.findOne({ user: req.user._id });
+
+    if (!wallet) {
+      return res.status(404).json({ error: 'Wallet not found' });
+    }
+
+    const previousBalance = wallet.balance;
+
+    if (previousBalance === 0) {
+      return res.status(400).json({ error: 'Wallet balance is already zero' });
+    }
+
+    // Reset balance to zero
+    wallet.balance = 0;
+    await wallet.save();
+
+    // Create transaction record
+    const transaction = new Transaction({
+      user: req.user._id,
+      type: 'withdrawal',
+      amount: previousBalance,
+      description: `Wallet reset to zero (Previous balance: ₹${previousBalance.toFixed(2)})`
+    });
+    await transaction.save();
+
+    res.json({
+      message: 'Wallet reset to zero successfully',
+      balance: wallet.balance
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to reset wallet',
+      message: error.message
+    });
   }
 };
 

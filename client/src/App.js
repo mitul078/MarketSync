@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Moon, Sun, LogOut, User, Wallet } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
+import { useToast } from './components/Toast';
 import TradeEntryForm from './components/TradeEntryForm';
 import TradeList from './components/TradeList';
 import SummaryStats from './components/SummaryStats';
@@ -11,6 +12,7 @@ import axios from 'axios';
 
 function App() {
   const { user, isAuthenticated, loading, login, signup, logout } = useAuth();
+  const toast = useToast();
   const [darkMode, setDarkMode] = useState(false);
   const [trades, setTrades] = useState([]);
   const [tradesLoading, setTradesLoading] = useState(false);
@@ -76,7 +78,7 @@ function App() {
         logout();
       } else {
         const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Failed to save trade. Please try again.';
-        alert(errorMsg);
+        toast.error(errorMsg);
       }
     }
   };
@@ -86,13 +88,12 @@ function App() {
       await axios.delete(`/api/trades/${id}`);
       setTrades(trades.filter(trade => trade._id !== id));
       fetchBalance(); // Refresh balance after deletion (refund)
-      
     } catch (error) {
       console.error('Error deleting trade:', error);
       if (error.response?.status === 401) {
         logout();
       } else {
-        alert('Failed to delete trade. Please try again.');
+        toast.error('Failed to delete trade. Please try again.');
       }
     }
   };
@@ -104,6 +105,20 @@ function App() {
       return response.data;
     } catch (error) {
       console.error('Error adding funds:', error);
+      if (error.response?.status === 401) {
+        logout();
+      }
+      throw error;
+    }
+  };
+
+  const handleResetWallet = async () => {
+    try {
+      const response = await axios.post('/api/wallet/reset');
+      setBalance(response.data.balance);
+      return response.data;
+    } catch (error) {
+      console.error('Error resetting wallet:', error);
       if (error.response?.status === 401) {
         logout();
       }
@@ -251,7 +266,7 @@ function App() {
         ) : activeTab === 'new-trade' ? (
           <TradeEntryForm onSubmit={handleTradeSubmit} balance={balance} />
         ) : (
-          <AddFunds onAdd={handleAddFunds} balance={balance} />
+          <AddFunds onAdd={handleAddFunds} onReset={handleResetWallet} balance={balance} />
         )}
       </main>
 

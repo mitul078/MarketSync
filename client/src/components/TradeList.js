@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Trash2, Filter, Search, Download } from 'lucide-react';
 import { format } from 'date-fns';
+import { useToast } from './Toast';
 import ExportModal from './ExportModal';
 
 const TradeList = ({ trades, onDelete }) => {
+  const toast = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
@@ -171,17 +173,21 @@ const TradeList = ({ trades, onDelete }) => {
                           {trade.learningNote || 'No notes'}
                         </td>
                         <td className="py-3 sm:py-4 px-2 sm:px-4 text-center">
-                          <button
-                            onClick={() => {
-                              if (window.confirm('Are you sure you want to delete this trade?')) {
+                        <button
+                          onClick={() => {
+                            toast.confirm(
+                              'Are you sure you want to delete this trade?',
+                              () => {
                                 onDelete(trade._id);
+                                toast.success('Trade deleted successfully');
                               }
-                            }}
-                            className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                            title="Delete trade"
-                          >
-                            <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                          </button>
+                            );
+                          }}
+                          className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                          title="Delete trade"
+                        >
+                          <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
                         </td>
                       </tr>
                     );
