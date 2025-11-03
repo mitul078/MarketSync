@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, ArrowUpRight, ArrowDownLeft, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { X, ArrowUpRight, ArrowDownLeft, Wallet } from 'lucide-react';
 import axios from 'axios';
 import { format } from 'date-fns';
 

@@ -54,7 +54,6 @@ const TradeEntryForm = ({ onSubmit, balance }) => {
 
     // Turnover = (Entry Price + Exit Price) × Quantity
     const turnover = (entry + exit) * qty;
-    const capitalUsed = entry * qty; // For brokerage calculation
 
     let brokerage, stt, exchangeTxn, sebiCharges, stampDuty, gst;
 
